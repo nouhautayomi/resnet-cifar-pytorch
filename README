@@ -1,4 +1,4 @@
-<h1>I am trying to improve the accuracy and convergence speed of cifar10.</h1>
+I am trying to improve the accuracy and convergence speed of cifar10.
 
 Now,I use ResNet18 and Ranger(lookahead optimizer+RAdam).
 And I implemented AMSgrad's method in RAdam.
