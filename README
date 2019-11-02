@@ -3,6 +3,11 @@ I am trying to improve the accuracy and convergence speed of cifar10.
 Now,I use ResNet18 and Ranger(lookahead optimizer+RAdam).
 And I implemented AMSgrad's method in RAdam.
 
+If you use this code, you have to add a new file in your folder,"cifar10_resnet18.pt".
+
+
+
+
 Lookahead and ResNet18 reference is (https://github.com/michaelrzhang/lookahead).
 RAdam reference is (https://github.com/LiyuanLucasLiu/RAdam).
 Thanks.
