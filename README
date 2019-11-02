@@ -1,3 +1,5 @@
-This code is RAnger optimizer.
+This code is RAnger(Lookahead+RAdam) optimizer.
 
-Resnet18 refference is cut-out.
+Lookahead + Resnet18 refference is (https://github.com/michaelrzhang/lookahead).
+RAdam refference is (https://github.com/LiyuanLucasLiu/RAdam).
+Thanks.
