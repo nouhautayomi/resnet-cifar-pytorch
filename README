@@ -1,5 +1,7 @@
 This code is RAnger(Lookahead+RAdam) optimizer.
 
-Lookahead + Resnet18 refference is (https://github.com/michaelrzhang/lookahead).
-RAdam refference is (https://github.com/LiyuanLucasLiu/RAdam).
+I implemented AMSgrad method in Radam.
+
+Lookahead + Resnet18 reference is (https://github.com/michaelrzhang/lookahead).
+RAdam reference is (https://github.com/LiyuanLucasLiu/RAdam).
 Thanks.
