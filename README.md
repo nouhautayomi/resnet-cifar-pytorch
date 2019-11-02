@@ -2,7 +2,7 @@
 
 I'm trying to improve the accuracy and convergence speed of cifar10.
 
-# Now accuracy
+# Now best accuracy
 95.31%
 
 ## My optimizer and training model
