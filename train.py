@@ -222,11 +222,14 @@ for epoch in range(args.epochs):
             xentropy='%.4f' % (xentropy),
             acc='%.4f' % accuracy)
 
-    cnn_optimizer._backup_and_load_cache()
-    test_acc = test(test_loader)
-    tqdm.write('test_acc: %.3f' % (test_acc))
-    cnn_optimizer._clear_and_load_backup()
-
+    if args.lookahead:
+        cnn_optimizer._backup_and_load_cache()
+        test_acc = test(test_loader)
+        tqdm.write('test_acc: %.4f' % (test_acc))
+        cnn_optimizer._clear_and_load_backup()
+    else:
+        test_acc = test(test_loader)
+        tqdm.write('test_acc: %.4f' % (test_acc))
 
     scheduler.step(epoch)
 
