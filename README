@@ -1,13 +1,18 @@
-I am trying to improve the accuracy and convergence speed of cifar10.
+# Train CIFAR10 with PyTorch
 
-Now,I use ResNet18 and Ranger(lookahead optimizer+RAdam).
-And I implemented AMSgrad's method in RAdam.
+I'm trying to improve the accuracy and convergence speed of cifar10.
 
-If you use this code, you have to add a new file in your folder,"cifar10_resnet18.pt".
+#My optimizer and training model
+I use ResNet18 and Ranger(lookahead optimizer+RAdam).
+I implemented AMSgrad's method in RAdam.
+
+
+#attention
+If you use this code, you have to add a new file:"cifar10_resnet18.pt" in your folder.
 
 
 
-
+#Reference
 Lookahead and ResNet18 reference is (https://github.com/michaelrzhang/lookahead).
 RAdam reference is (https://github.com/LiyuanLucasLiu/RAdam).
 Thanks.
