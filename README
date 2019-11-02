@@ -1,7 +1,8 @@
-This code is RAnger(Lookahead+RAdam) optimizer.
+I am trying to improve the accuracy and convergence speed of cifar10.
 
-I implemented AMSgrad method in Radam.
+Now,I use ResNet18 and Ranger(lookahead optimizer+RAdam).
+And I implemented AMSgrad's method in RAdam.
 
-Lookahead + Resnet18 reference is (https://github.com/michaelrzhang/lookahead).
+Lookahead and ResNet18 reference is (https://github.com/michaelrzhang/lookahead).
 RAdam reference is (https://github.com/LiyuanLucasLiu/RAdam).
 Thanks.
