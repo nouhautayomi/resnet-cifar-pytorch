@@ -20,6 +20,7 @@ from wide_resnet import WideResNet
 
 from lookahead_pytorch import Lookahead
 from radam import RAdam
+from radam import AdamW
 
 model_options = ['resnet18', 'wideresnet']
 dataset_options = ['cifar10', 'cifar100', 'svhn']
@@ -157,7 +158,8 @@ cnn = cnn.cuda()
 criterion = nn.CrossEntropyLoss().cuda()
 #cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=args.learning_rate,
 #                                momentum=0.9, nesterov=True, weight_decay=5e-4)
-cnn_optimizer = RAdam(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-4, degenerated_to_sgd=True, AMSGrad=True)
+#cnn_optimizer = RAdam(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-4, degenerated_to_sgd=True, AMSGrad=True)
+cnn_optimizer = AdamW(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, warmup = 0)
 if args.lookahead:
     cnn_optimizer = Lookahead(cnn_optimizer, la_steps=args.la_steps, la_alpha=args.la_alpha)
 if args.dataset == 'svhn':
