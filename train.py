@@ -22,32 +22,29 @@ from lookahead_pytorch import Lookahead
 from radam import RAdam
 from radam import AdamW
 
-model_options = ['resnet18', 'wideresnet']
-dataset_options = ['cifar10', 'cifar100', 'svhn']
+model_options = ['resnet18']
+dataset_options = ['cifar10', 'cifar100']
+#optimizer_options = ['SGD','AdamW','RAdam']
+
+test_type = True
+#test_type is True when you can test acc, is False when you can watch convergence_rate
 
 parser = argparse.ArgumentParser(description='CNN')
 parser.add_argument('--dataset', '-d', default='cifar10',
                     choices=dataset_options)
 parser.add_argument('--model', '-a', default='resnet18',
                     choices=model_options)
-parser.add_argument('--batch_size', type=int, default=128,
-                    help='input batch size for training (default: 128)')
-parser.add_argument('--epochs', type=int, default=200,
-                    help='number of epochs to train (default: 20)')
-parser.add_argument('--learning_rate', type=float, default=0.1,
-                    help='learning rate')
-parser.add_argument('--data_augmentation', action='store_true', default=True,
-                    help='augment data by flipping and cropping')
-parser.add_argument('--cutout', action='store_true', default=True,
-                    help='apply cutout')
-parser.add_argument('--n_holes', type=int, default=1,
-                    help='number of holes to cut out from image')
-parser.add_argument('--length', type=int, default=16,
-                    help='length of the holes')
-parser.add_argument('--no-cuda', action='store_true', default=True,
-                    help='enables CUDA training')
-parser.add_argument('--seed', type=int, default=1,
-                    help='random seed (default: 1)')
+#parser.add_argument('--optimizer', '-a', default='SGD',
+#                    choices=optimizer_options)
+parser.add_argument('--batch_size', type=int, default=128,help='input batch size for training (default: 128)')
+parser.add_argument('--epochs', type=int, default=200,help='number of epochs to train (default: 20)')
+parser.add_argument('--learning_rate', type=float, default=0.1,help='learning rate')
+parser.add_argument('--data_augmentation', action='store_true', default=test_type,help='augment data by flipping and cropping')
+parser.add_argument('--cutout', action='store_true', default=test_type,help='apply cutout')
+parser.add_argument('--n_holes', type=int, default=1,help='number of holes to cut out from image')
+parser.add_argument('--length', type=int, default=16,help='length of the holes')
+parser.add_argument('--no-cuda', action='store_true', default=test_type,help='enables CUDA training')
+parser.add_argument('--seed', type=int, default=1,help='random seed (default: 1)')
 parser.add_argument('--lookahead', action='store_true', default=True)
 parser.add_argument('--la_steps', type=int, default=5)
 parser.add_argument('--la_alpha', type=float, default=0.5)
@@ -65,11 +62,7 @@ test_id = args.dataset + '_' + args.model
 print(args)
 
 # Image Preprocessing
-if args.dataset == 'svhn':
-    normalize = transforms.Normalize(mean=[x / 255.0 for x in[109.9, 109.7, 113.8]],
-                                     std=[x / 255.0 for x in [50.1, 50.6, 50.8]])
-else:
-    normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
+normalize = transforms.Normalize(mean=[x / 255.0 for x in [125.3, 123.0, 113.9]],
                                      std=[x / 255.0 for x in [63.0, 62.1, 66.7]])
 
 train_transform = transforms.Compose([])
@@ -108,18 +101,6 @@ elif args.dataset == 'cifar100':
                                      train=False,
                                      transform=test_transform,
                                      download=True)
-elif args.dataset == 'svhn':
-    num_classes = 10
-    train_dataset = datasets.SVHN(root='data/',
-                                  split='train',
-                                  transform=train_transform,
-                                  download=True)
-
-    extra_dataset = datasets.SVHN(root='data/',
-                                  split='extra',
-                                  transform=train_transform,
-                                  download=True)
-
     # Combine both training splits (https://arxiv.org/pdf/1605.07146.pdf)
     data = np.concatenate([train_dataset.data, extra_dataset.data], axis=0)
     labels = np.concatenate([train_dataset.labels, extra_dataset.labels], axis=0)
@@ -144,28 +125,18 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset,
                                           pin_memory=True,
                                           num_workers=2)
 
-if args.model == 'resnet18':
-    cnn = ResNet18(num_classes=num_classes)
-elif args.model == 'wideresnet':
-    if args.dataset == 'svhn':
-        cnn = WideResNet(depth=16, num_classes=num_classes, widen_factor=8,
-                         dropRate=0.4)
-    else:
-        cnn = WideResNet(depth=28, num_classes=num_classes, widen_factor=10,
-                         dropRate=0.3)
-
+cnn = ResNet18(num_classes=num_classes)
 cnn = cnn.cuda()
 criterion = nn.CrossEntropyLoss().cuda()
+
 #cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=args.learning_rate,
 #                                momentum=0.9, nesterov=True, weight_decay=5e-4)
 #cnn_optimizer = RAdam(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-4, degenerated_to_sgd=True, AMSGrad=True)
 cnn_optimizer = AdamW(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, warmup = 0)
 if args.lookahead:
     cnn_optimizer = Lookahead(cnn_optimizer, la_steps=args.la_steps, la_alpha=args.la_alpha)
-if args.dataset == 'svhn':
-    scheduler = MultiStepLR(cnn_optimizer, milestones=[80, 120], gamma=0.1)
-else:
-    scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
+
+scheduler = MultiStepLR(cnn_optimizer, milestones=[60, 120, 160], gamma=0.2)
 
 filename = test_id + '.csv'
 csv_logger = CSVLogger(args=args, fieldnames=['epoch', 'train_loss', 'test_acc'], filename=filename)
