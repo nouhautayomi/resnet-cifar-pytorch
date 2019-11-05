@@ -28,10 +28,10 @@ optimizer_options = ['SGD','AdamW','RAdam']
 
 test_type = False
 #test_type is True when you can test acc, is False when you can watch convergence_rate
-if test_type == True:
-    test_type_cuda = False
+if test_type:
+    epo = 200
 else:
-    test_type_cuda = True
+    epo = 60
 
 parser = argparse.ArgumentParser(description='CNN')
 parser.add_argument('--dataset', '-d', default='cifar10',choices=dataset_options)
@@ -44,7 +44,7 @@ parser.add_argument('--data_augmentation', action='store_true', default=test_typ
 parser.add_argument('--cutout', action='store_true', default=test_type,help='apply cutout')
 parser.add_argument('--n_holes', type=int, default=1, help='number of holes to cut out from image')
 parser.add_argument('--length', type=int, default=16, help='length of the holes')
-parser.add_argument('--no-cuda', action='store_true', default=test_type_cuda, help='enables CUDA training')
+parser.add_argument('--no-cuda', action='store_true', default=True, help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1,help='random seed (default: 1)')
 parser.add_argument('--lookahead', action='store_true', default=True)
 parser.add_argument('--la_steps', type=int, default=5)
