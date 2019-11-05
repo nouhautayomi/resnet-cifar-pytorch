@@ -24,30 +24,32 @@ from radam import AdamW
 
 model_options = ['resnet18']
 dataset_options = ['cifar10', 'cifar100']
-#optimizer_options = ['SGD','AdamW','RAdam']
+optimizer_options = ['SGD','AdamW','RAdam']
 
-test_type = True
+test_type = False
 #test_type is True when you can test acc, is False when you can watch convergence_rate
+if test_type == True:
+    test_type_cuda = False
+else:
+    test_type_cuda = True
 
 parser = argparse.ArgumentParser(description='CNN')
-parser.add_argument('--dataset', '-d', default='cifar10',
-                    choices=dataset_options)
-parser.add_argument('--model', '-a', default='resnet18',
-                    choices=model_options)
-#parser.add_argument('--optimizer', '-a', default='SGD',
-#                    choices=optimizer_options)
-parser.add_argument('--batch_size', type=int, default=128,help='input batch size for training (default: 128)')
-parser.add_argument('--epochs', type=int, default=200,help='number of epochs to train (default: 20)')
+parser.add_argument('--dataset', '-d', default='cifar10',choices=dataset_options)
+parser.add_argument('--model', '-a', default='resnet18',choices=model_options)
+parser.add_argument('--optimizer', '-b', default='RAdam',choices=optimizer_options)
+parser.add_argument('--batch_size', type=int, default=128, help='input batch size for training (default: 128)')
+parser.add_argument('--epochs', type=int, default=200, help='number of epochs to train (default: 200)')
 parser.add_argument('--learning_rate', type=float, default=0.1,help='learning rate')
-parser.add_argument('--data_augmentation', action='store_true', default=test_type,help='augment data by flipping and cropping')
+parser.add_argument('--data_augmentation', action='store_true', default=test_type, help='augment data by flipping and cropping')
 parser.add_argument('--cutout', action='store_true', default=test_type,help='apply cutout')
-parser.add_argument('--n_holes', type=int, default=1,help='number of holes to cut out from image')
-parser.add_argument('--length', type=int, default=16,help='length of the holes')
-parser.add_argument('--no-cuda', action='store_true', default=test_type,help='enables CUDA training')
+parser.add_argument('--n_holes', type=int, default=1, help='number of holes to cut out from image')
+parser.add_argument('--length', type=int, default=16, help='length of the holes')
+parser.add_argument('--no-cuda', action='store_true', default=test_type_cuda, help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1,help='random seed (default: 1)')
 parser.add_argument('--lookahead', action='store_true', default=True)
 parser.add_argument('--la_steps', type=int, default=5)
 parser.add_argument('--la_alpha', type=float, default=0.5)
+parser.add_argument('--AMSGrad', action='store_true', default=True)
 
 args = parser.parse_args(args=[])
 args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -129,10 +131,13 @@ cnn = ResNet18(num_classes=num_classes)
 cnn = cnn.cuda()
 criterion = nn.CrossEntropyLoss().cuda()
 
-#cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=args.learning_rate,
-#                                momentum=0.9, nesterov=True, weight_decay=5e-4)
-#cnn_optimizer = RAdam(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-4, degenerated_to_sgd=True, AMSGrad=True)
-cnn_optimizer = AdamW(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, warmup = 0)
+if args.optimizer == 'SGD':
+    cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=args.learning_rate,momentum=0.9, nesterov=True, weight_decay=5e-4)
+elif args.optimizer == 'RAdam':
+    cnn_optimizer = RAdam(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-4, degenerated_to_sgd=True, AMSGrad= args.AMSGrad)
+elif args.optimizer == 'AdamW':
+    cnn_optimizer = AdamW(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, warmup = 0)
+
 if args.lookahead:
     cnn_optimizer = Lookahead(cnn_optimizer, la_steps=args.la_steps, la_alpha=args.la_alpha)
 
