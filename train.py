@@ -44,7 +44,7 @@ parser.add_argument('--data_augmentation', action='store_true', default=test_typ
 parser.add_argument('--cutout', action='store_true', default=test_type,help='apply cutout')
 parser.add_argument('--n_holes', type=int, default=1, help='number of holes to cut out from image')
 parser.add_argument('--length', type=int, default=16, help='length of the holes')
-parser.add_argument('--no-cuda', action='store_true', default=True, help='enables CUDA training')
+parser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1,help='random seed (default: 1)')
 parser.add_argument('--lookahead', action='store_true', default=True)
 parser.add_argument('--la_steps', type=int, default=5)
@@ -134,9 +134,9 @@ criterion = nn.CrossEntropyLoss().cuda()
 if args.optimizer == 'SGD':
     cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=args.learning_rate,momentum=0.9, nesterov=True, weight_decay=5e-4)
 elif args.optimizer == 'RAdam':
-    cnn_optimizer = RAdam(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-4, degenerated_to_sgd=True, AMSGrad= args.AMSGrad)
+    cnn_optimizer = RAdam(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-4, degenerated_to_sgd=True, AMSGrad=args.AMSGrad)
 elif args.optimizer == 'AdamW':
-    cnn_optimizer = AdamW(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, warmup = 0)
+    cnn_optimizer = AdamW(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0, warmup=0, AMSGrad=args.AMSGrad)
 
 if args.lookahead:
     cnn_optimizer = Lookahead(cnn_optimizer, la_steps=args.la_steps, la_alpha=args.la_alpha)
