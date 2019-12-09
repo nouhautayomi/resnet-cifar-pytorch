@@ -133,9 +133,9 @@ criterion = nn.CrossEntropyLoss().cuda()
 if args.optimizer == 'SGD':
     cnn_optimizer = torch.optim.SGD(cnn.parameters(), lr=args.learning_rate,momentum=0.9, nesterov=True, weight_decay=5e-4)
 elif args.optimizer == 'RAdam':
-    cnn_optimizer = RAdam(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-4, degenerated_to_sgd=True, AMSGrad=args.AMSGrad)
+    cnn_optimizer = RAdam(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8, weight_decay=0.1, degenerated_to_sgd=True, AMSGrad=args.AMSGrad)
 elif args.optimizer == 'AdamW':
-    cnn_optimizer = torch.optim.AdamW(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8,weight_decay=1e-2, amsgrad=args.AMSGrad)
+    cnn_optimizer = torch.optim.AdamW(cnn.parameters(), lr=1e-3, betas=(0.9, 0.999), eps=1e-8,weight_decay=0.1, amsgrad=args.AMSGrad)
 
 if args.lookahead:
     cnn_optimizer = Lookahead(cnn_optimizer, la_steps=args.la_steps, la_alpha=args.la_alpha)
