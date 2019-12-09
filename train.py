@@ -26,9 +26,9 @@ model_options = ['resnet18']
 dataset_options = ['cifar10', 'cifar100']
 optimizer_options = ['SGD','AdamW','RAdam']
 
-test_type = False
+test_type = True
 #test_type is True when you can test acc, is False when you can watch convergence_rate
-if test_type:
+if test_type==True:
     epo = 200
 else:
     epo = 60
@@ -36,20 +36,20 @@ else:
 parser = argparse.ArgumentParser(description='CNN')
 parser.add_argument('--dataset', '-d', default='cifar10',choices=dataset_options)
 parser.add_argument('--model', '-a', default='resnet18',choices=model_options)
-parser.add_argument('--optimizer', '-b', default='RAdam',choices=optimizer_options)
+parser.add_argument('--optimizer', '-b', default='SGD',choices=optimizer_options)
 parser.add_argument('--batch_size', type=int, default=128, help='input batch size for training (default: 128)')
-parser.add_argument('--epochs', type=int, default=200, help='number of epochs to train (default: 200)')
+parser.add_argument('--epochs', type=int, default=epo, help='number of epochs to train (default: 200)')
 parser.add_argument('--learning_rate', type=float, default=0.1,help='learning rate')
 parser.add_argument('--data_augmentation', action='store_true', default=test_type, help='augment data by flipping and cropping')
-parser.add_argument('--cutout', action='store_true', default=test_type,help='apply cutout')
+parser.add_argument('--cutout', action='store_true', default=False,help='apply cutout')
 parser.add_argument('--n_holes', type=int, default=1, help='number of holes to cut out from image')
 parser.add_argument('--length', type=int, default=16, help='length of the holes')
 parser.add_argument('--no-cuda', action='store_true', default=False, help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1,help='random seed (default: 1)')
-parser.add_argument('--lookahead', action='store_true', default=True)
+parser.add_argument('--lookahead', action='store_true', default=False)
 parser.add_argument('--la_steps', type=int, default=5)
 parser.add_argument('--la_alpha', type=float, default=0.5)
-parser.add_argument('--AMSGrad', action='store_true', default=True)
+parser.add_argument('--AMSGrad', action='store_true', default=False)
 
 args = parser.parse_args(args=[])
 args.cuda = not args.no_cuda and torch.cuda.is_available()
